@@ -6,6 +6,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import Hardware.SmartDevices.*;
 
+/**
+ * Smart IMU
+ * Class for computation and calculations to use the BNO055IMU
+ */
+
 public class SmartIMU extends SmartDevice {
     SmartIMUConfiguration configuration;
     BNO055IMU imu;
@@ -17,6 +22,11 @@ public class SmartIMU extends SmartDevice {
         position = new Orientation();
     }
 
+
+    /**
+     * Methods to get the three axis of motion
+     * The result is calculated to restrict the rotation to between (0, 2pi) or (0, 360)
+     */
     public double getHeading(){
         double tau = 2 * Math.PI;
         double rad = ((((position.firstAngle - offset.firstAngle) % tau) + tau) % tau);
@@ -50,6 +60,7 @@ public class SmartIMU extends SmartDevice {
     @Override
     public void calibrate() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = configuration.sensorMode;
         parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = true;

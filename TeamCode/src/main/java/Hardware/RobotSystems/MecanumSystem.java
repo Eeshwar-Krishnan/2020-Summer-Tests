@@ -4,7 +4,8 @@ import MathUtils.*;
 
 public class MecanumSystem {
     /**
-     * Translates x y r to motor powers
+     * Translates x y r to motor powers, where x is the strafe velocity, y is the forward velocity, and r is the rotational velocity
+     * All velocities should be in the range (-1, 1)
      * @param coords a vector3 containing {x, y, r}
      * @return motor powers in a vector4
      */

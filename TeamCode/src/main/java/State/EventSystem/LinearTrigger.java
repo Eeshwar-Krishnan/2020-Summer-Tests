@@ -4,6 +4,13 @@ import Hardware.Packets.HardwareData;
 import Hardware.Packets.SensorData;
 import State.StateMachine;
 
+/**
+ * Linear Trigger
+ * Linear Trigger triggers its states when a given number matches an internal number
+ * This is intended to be used in a linear manner, with the external given number incremented by one when the next group needs to be triggered
+ * if disableOnEndTrigger is true, the logicstates and drivestates added to the trigger will be disabled when the number changes
+ */
+
 public class LinearTrigger extends EventSystemTrigger {
     private int order, currentNumber;
     boolean disableOnEndTrigger;

@@ -5,6 +5,11 @@ import java.util.*;
 import Hardware.Packets.*;
 import State.*;
 
+/**
+ * Event System Trigger
+ * Contains a list of logicstates and a drivestate that are triggered when trigger() returns true
+ */
+
 public abstract class EventSystemTrigger {
     ArrayList<String> states;
     String driveState;

@@ -2,6 +2,11 @@ package Hardware.SmartDevices.SmartIMU;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
+/**
+ * Smart IMU Configuration
+ * Contains configurations for setting the Angle Unit and Sensor Mode
+ */
+
 public class SmartIMUConfiguration {
     SmartIMU.AngleUnit angleUnit;
     BNO055IMU.SensorMode sensorMode;
@@ -10,20 +15,14 @@ public class SmartIMUConfiguration {
         sensorMode = BNO055IMU.SensorMode.IMU;
     }
 
-    public SmartIMU.AngleUnit getAngleUnit() {
-        return angleUnit;
-    }
-
-    public void setAngleUnit(SmartIMU.AngleUnit angleUnit) {
+    public SmartIMUConfiguration setAngleUnit(SmartIMU.AngleUnit angleUnit) {
         this.angleUnit = angleUnit;
+        return this;
     }
 
-    public BNO055IMU.SensorMode getSensorMode() {
-        return sensorMode;
-    }
-
-    public void setSensorMode(BNO055IMU.SensorMode sensorMode) {
+    public SmartIMUConfiguration setSensorMode(BNO055IMU.SensorMode sensorMode) {
         this.sensorMode = sensorMode;
+        return this;
     }
 
     @Override

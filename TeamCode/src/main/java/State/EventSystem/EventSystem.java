@@ -6,6 +6,12 @@ import java.util.*;
 import Hardware.Packets.*;
 import State.*;
 
+/**
+ * The event system triggers states depending on external events
+ * Events can be triggered on init, on start, and on a custom trigger
+ * See EventSystemTrigger for more information
+ */
+
 public class EventSystem {
     private StateMachine stateMachine;
     private ArrayList<EventSystemTrigger> triggers;

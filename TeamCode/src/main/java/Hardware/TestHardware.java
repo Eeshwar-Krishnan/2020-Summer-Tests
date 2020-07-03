@@ -6,10 +6,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import Hardware.Packets.HardwareData;
 import Hardware.Packets.SensorData;
 
+/**
+ * Test Hardware class, which is completely empty
+ * This can be used to test classes without attaching the phone to the robot
+ */
+
 public class TestHardware extends Hardware {
-    public TestHardware(LinearOpMode opMode) {
-        super(opMode);
-    }
 
     @Override
     public void registerDevices(HardwareMap map) {

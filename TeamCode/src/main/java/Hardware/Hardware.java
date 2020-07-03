@@ -3,24 +3,39 @@ package Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import Hardware.Packets.*;
 import Hardware.SmartDevices.*;
 
+/**
+ * Generic Hardware class
+ *
+ * The hardware class implements runnable, meaning it can be threaded for maximum performance
+ */
+
 public abstract class Hardware implements Runnable {
     public HashMap<String, SmartDevice> smartDevices = new HashMap<>();
+    public ArrayList<Hardware.Hardware.HardwareDevices> registeredDevices, enabledDevices;
     public LinearOpMode opMode;
     private final ArrayList<HardwareData> hardwarePackets;
     private ArrayList<SensorData> sensorPackets;
 
-    public Hardware(LinearOpMode opMode){
-        this.opMode = opMode;
+    public Hardware(){
         hardwarePackets = new ArrayList<>();
         sensorPackets = new ArrayList<>();
         sensorPackets.add(new SensorData());
+        registeredDevices = new ArrayList<>();
+        enabledDevices = new ArrayList<>();
     }
+
+    public void attachOpmode(LinearOpMode opMode){
+        this.opMode = opMode;
+    }
+
+    /**
+     * Registers devices, adding them to the SmartDevice ArrayList
+     */
 
     public abstract void registerDevices(HardwareMap map);
 
@@ -32,24 +47,44 @@ public abstract class Hardware implements Runnable {
         }
     }
 
+    /**
+     * Reads in hardware data, using the data to update smart devices. Do not call update() from this method
+     */
+
     public abstract void setHardware(HardwareData hardware);
+
+    /**
+     * Puts data from smart devices into the sensor data packet. Do not call update() from this method
+     */
 
     public abstract void setSensors(SensorData sensorData);
 
+    /**
+     * Fetches the first sensor data packet from the array. An array is used to keep the Sensor Data threadsafe
+     */
+
     public SensorData getSensorData(){
-        SensorData out = sensorPackets.get(0);
-        if(sensorPackets.size() > 1){
-            sensorPackets.remove(0);
+        synchronized (sensorPackets) {
+            SensorData out = sensorPackets.get(0);
+            if (sensorPackets.size() > 1) {
+                sensorPackets.remove(0);
+            }
+            return out;
         }
-        return out;
     }
 
     public HashMap<String, SmartDevice> getSmartDevices(){
         return smartDevices;
     }
 
+    /**
+     * Adds a hardware packet to the array. An array is used to keep the Hardware Data threadsafe
+     */
+
     public void addHardwarePacket(HardwareData hardware){
-        hardwarePackets.add(hardware);
+        synchronized (hardwarePackets) {
+            hardwarePackets.add(hardware);
+        }
     }
 
     @Override
@@ -67,6 +102,49 @@ public abstract class Hardware implements Runnable {
         }
         SensorData sensorData = new SensorData();
         setSensors(sensorData);
-        sensorPackets.add(sensorData);
+        synchronized (sensorPackets) {
+            sensorPackets.add(sensorData);
+        }
+    }
+
+    public void enableDevice(HardwareDevices device){
+        enabledDevices.add(device);
+    }
+
+    public void registerDevice(HardwareDevices device){
+        registeredDevices.add(device);
+    }
+
+    public void registerAll(){
+        registeredDevices.add(HardwareDevices.DRIVE_MOTORS);
+        registeredDevices.add(HardwareDevices.INTAKE);
+        registeredDevices.add(HardwareDevices.ODOMETRY);
+        registeredDevices.add(HardwareDevices.GYRO);
+    }
+
+    public void enableAll(){
+        enabledDevices.add(HardwareDevices.DRIVE_MOTORS);
+        enabledDevices.add(HardwareDevices.INTAKE);
+        enabledDevices.add(HardwareDevices.ODOMETRY);
+        enabledDevices.add(HardwareDevices.GYRO);
+    }
+
+    public void disableAll(){
+        enabledDevices.clear();
+    }
+
+    public void disableDevice(HardwareDevices device){
+        enabledDevices.remove(device);
+    }
+
+    public void deRegisterDevice(HardwareDevices device){
+        registeredDevices.remove(device);
+    }
+
+    public static enum HardwareDevices {
+        DRIVE_MOTORS,
+        INTAKE,
+        GYRO,
+        ODOMETRY;
     }
 }

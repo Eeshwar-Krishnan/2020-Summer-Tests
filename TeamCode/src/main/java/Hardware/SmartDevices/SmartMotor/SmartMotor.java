@@ -6,6 +6,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import Hardware.SmartDevices.SmartDevice;
 
+/**
+ * Smart Motor
+ * Contains methods to use the DCMotorEx class, which provides more functionality then DcMotor
+ * Calibration sets the runmode and zeroes the encoder
+ * If the set motor power is within 0.005 of the current motor power, it ignores the result to prevent unneeded setpower calls
+ */
+
 public class SmartMotor extends SmartDevice {
     private DcMotorEx motor;
     private SmartMotorConfiguration configuration;

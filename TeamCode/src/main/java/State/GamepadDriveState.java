@@ -4,13 +4,17 @@ import com.qualcomm.robotcore.hardware.*;
 
 import Hardware.Packets.*;
 
-import Hardware.RobotSystems.MecanumSystem;
 import MathUtils.*;
+
+/**
+ * Drives the robot using the given gamepad. Acts as a drive state
+ */
 
 public class GamepadDriveState extends VelocityDriveState {
     Gamepad gamepad;
 
-    public GamepadDriveState(Gamepad gamepad){
+    public GamepadDriveState(StateMachine stateMachine, Gamepad gamepad){
+        super(stateMachine);
         this.gamepad = gamepad;
     }
 

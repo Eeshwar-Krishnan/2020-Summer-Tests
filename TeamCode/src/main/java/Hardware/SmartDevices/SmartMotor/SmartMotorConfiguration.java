@@ -4,6 +4,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+/**
+ * Smart Motor Configuration
+ *
+ * Contains configuration for the Smart Motor class
+ */
+
 public class SmartMotorConfiguration {
     boolean readPosition, readVelocity, direction;
     DcMotor.RunMode runMode;

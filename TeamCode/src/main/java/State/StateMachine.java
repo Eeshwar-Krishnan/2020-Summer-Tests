@@ -6,11 +6,19 @@ import Hardware.Packets.*;
 
 import MathUtils.*;
 
+/**
+ * The statemachine is the main system for executing code
+ * Logic States are run asynchronously to each other, on the same thread
+ * Any number of logic states can be added and activated, so you should separate code into separate states for readability
+ * States can also be enabled and disabled, allowing for timers and other systems to be run cleanly and asynchronously
+ */
+
 public class StateMachine {
     HashMap<String, LogicState> queriedLogicStates, activeLogicStates, logicStates, deactivatedLogicStates;
     HashMap<String, Long> delayedActivations;
     ArrayList<String> driveStates;
     String activeDriveState;
+    DriveState driveState;
 
     public StateMachine(){
         queriedLogicStates = new HashMap<>();
@@ -115,6 +123,13 @@ public class StateMachine {
             return true;
         }
         return false;
+    }
+
+    public Vector4 getDriveVelocities(){
+        if(logicStates.containsKey(activeDriveState)){
+            return ((DriveState) logicStates.get(activeDriveState)).getDriveVelocities();
+        }
+        return Vector4.ZERO();
     }
 
     @Override

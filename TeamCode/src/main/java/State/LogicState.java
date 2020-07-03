@@ -3,6 +3,14 @@ package State;
 import Hardware.Packets.HardwareData;
 import Hardware.Packets.SensorData;
 
+/**
+ * LogicStates are the cornerstone of the statemachine system
+ * A logic state is a self contained group of code that is executed every frame
+ * init is called when the state is first activated
+ * update calls every frame the logic state is active
+ * onStop is called when the logic state is stopped
+ */
+
 public abstract class LogicState {
     String name;
     StateMachine stateMachine;

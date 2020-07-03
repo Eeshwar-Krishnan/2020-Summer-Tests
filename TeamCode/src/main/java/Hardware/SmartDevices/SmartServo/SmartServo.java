@@ -4,6 +4,11 @@ import com.qualcomm.robotcore.hardware.*;
 
 import Hardware.SmartDevices.*;
 
+/**
+ * Contains methods for the usage of the Servo and ServoImpl classes
+ * Allows for the enabling and disabling of the PMW to the servo, which will stop it from holding position
+ */
+
 public class SmartServo extends SmartDevice {
     private Servo servo;
     private double position, prevPosition;
@@ -52,7 +57,7 @@ public class SmartServo extends SmartDevice {
 
     @Override
     public void update() {
-        if(Math.abs(position - prevPosition) < 0.005){
+        if(Math.abs(position - prevPosition) < 0.005 && ((ServoImplEx)servo).isPwmEnabled()){
             servo.setPosition(position);
             prevPosition = position;
         }
