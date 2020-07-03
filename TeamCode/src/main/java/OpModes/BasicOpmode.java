@@ -18,6 +18,7 @@ public abstract class BasicOpmode extends LinearOpMode {
     public StateMachine stateMachine;
     public EventSystem eventSystem;
     public Hardware hardware;
+    public OpmodeVariables opmodeVariables;
     private SensorData sensorData;
     private HardwareData hardwareData;
     private boolean triggeredRun;
@@ -28,6 +29,7 @@ public abstract class BasicOpmode extends LinearOpMode {
         stateMachine = new StateMachine();
         eventSystem = new EventSystem(stateMachine);
         triggeredRun = false;
+        opmodeVariables = new OpmodeVariables();
     }
 
     @Override

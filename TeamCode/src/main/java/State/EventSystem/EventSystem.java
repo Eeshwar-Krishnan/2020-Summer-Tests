@@ -44,8 +44,11 @@ public class EventSystem {
         startDriveState = state;
     }
 
-    public void addTrigger(EventSystemTrigger eventSystemTrigger){
-        triggers.add(eventSystemTrigger);
+    public void onTrigger(EventSystemTrigger eventSystemTrigger, String state, LogicState logicState){
+        if(!triggers.contains(eventSystemTrigger)){
+            triggers.add(eventSystemTrigger);
+        }
+        eventSystemTrigger.addState(state, logicState);
     }
 
     public void update(SensorData sensorData, HardwareData hardwareData){

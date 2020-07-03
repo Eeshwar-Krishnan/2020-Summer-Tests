@@ -12,27 +12,26 @@ import State.StateMachine;
  */
 
 public class LinearTrigger extends EventSystemTrigger {
-    private int order, currentNumber;
-    boolean disableOnEndTrigger;
-    public LinearTrigger(StateMachine stateMachine, int order, boolean disableOnEndTrigger) {
+    private int order;
+    private boolean disableOnEndTrigger;
+    private OpmodeVariables opmodeVariables;
+    private String orderName;
+    public LinearTrigger(StateMachine stateMachine, int order, boolean disableOnEndTrigger, OpmodeVariables opmodeVariables, String orderName) {
         super(stateMachine);
         this.order = order;
-        currentNumber = 0;
         this.disableOnEndTrigger = disableOnEndTrigger;
-    }
-
-    public void setCurrentNumber(int currentNumber){
-        this.currentNumber = currentNumber;
+        this.opmodeVariables = opmodeVariables;
+        this.orderName = orderName;
     }
 
     @Override
     public boolean trigger(SensorData sensorData, HardwareData hardwareData) {
-        if(order != currentNumber && disableOnEndTrigger){
+        if(order != opmodeVariables.integers.get(orderName) && disableOnEndTrigger){
             for(String state : states){
                 stateMachine.deactivateState(state);
             }
             stateMachine.deactivateState(driveState);
         }
-        return order == currentNumber;
+        return order == opmodeVariables.integers.get(orderName);
     }
 }
