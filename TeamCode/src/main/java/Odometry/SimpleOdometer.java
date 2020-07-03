@@ -34,7 +34,8 @@ public class SimpleOdometer extends Odometer {
     @Override
     public void update(SensorData sensors, HardwareData hardwareData) {
         double forInc = ((sensors.getOdometryLeft() + sensors.getOdometryRight())/2) - prevEncoderValues.getA();
-        double rotInc = (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT) - prevEncoderValues.getC();
+        //double rotInc = (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT) - prevEncoderValues.getC();
+        double rotInc = MathUtils.getRadRotDist(prevEncoderValues.getC(), sensors.getGyro());
         double strafeInc = (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)) - prevEncoderValues.getB();
         double r = Math.sqrt((forInc * forInc) + (strafeInc * strafeInc));
         if(r < 0.05){
@@ -43,13 +44,13 @@ public class SimpleOdometer extends Odometer {
         double theta = rot + Math.atan2(forInc, strafeInc);
         x += r * Math.cos(theta);
         y += r * Math.sin(theta);
-        rot += rotInc;
+        rot = sensors.getGyro();
         double tau = (2 * Math.PI);
         rot = ((rot % tau) + tau) % tau;
         position.set(x * TRANSLATION_FACTOR, y * TRANSLATION_FACTOR, rot);
-        velocity.set(position.subtract(prevPosition).scale(1/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
+        velocity.set(position.subtract(prevPosition).scale(1.0/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
         prevPosition.set(position);
         prevTime = System.nanoTime();
-        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT));
+        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), sensors.getGyro());
     }
 }

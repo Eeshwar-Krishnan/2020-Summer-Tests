@@ -35,8 +35,8 @@ public class ConstantVOdometer extends Odometer {
     @Override
     public void update(SensorData sensors, HardwareData hardwareData) {
         double forInc = ((sensors.getOdometryLeft() + sensors.getOdometryRight())/2) - prevEncoderValues.getA();
-        double rotInc = MathUtils.getRadRotDist(prevEncoderValues.getC(), (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT));
-        //double rotInc = sensors.getGyro() - prevEncoderValues.getC();
+        //double rotInc = MathUtils.getRadRotDist(prevEncoderValues.getC(), (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT));
+        double rotInc = MathUtils.getRadRotDist(prevEncoderValues.getC(), sensors.getGyro());
         double strafeInc = (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)) - prevEncoderValues.getB();
         Vector2 pos = MathUtils.toPolar(ConstantVMathUtil.toRobotCentric(forInc, strafeInc, rotInc));
         Vector2 fieldCentric = MathUtils.toCartesian(pos.getA(), pos.getB() + rot);
@@ -46,9 +46,9 @@ public class ConstantVOdometer extends Odometer {
         double tau = (2 * Math.PI);
         rot = ((rot % tau) + tau) % tau;
         position.set(x * TRANSLATION_FACTOR, y * TRANSLATION_FACTOR, rot);
-        velocity.set(position.subtract(prevPosition).scale(1/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
+        velocity.set(position.subtract(prevPosition).scale(1.0/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
         prevPosition.set(position);
         prevTime = System.nanoTime();
-        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT));
+        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), sensors.getGyro());
     }
 }
