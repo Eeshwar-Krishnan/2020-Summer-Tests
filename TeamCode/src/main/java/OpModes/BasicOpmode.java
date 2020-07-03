@@ -1,11 +1,13 @@
 package OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import Hardware.*;
 import Hardware.Packets.*;
 import State.EventSystem.*;
 import State.*;
+import MathUtils.*;
 
 /**
  * Basic OpMode
@@ -19,6 +21,8 @@ public abstract class BasicOpmode extends LinearOpMode {
     public EventSystem eventSystem;
     public Hardware hardware;
     public OpmodeVariables opmodeVariables;
+    protected double fps;
+    private long prevTime;
     private SensorData sensorData;
     private HardwareData hardwareData;
     private boolean triggeredRun;
@@ -40,19 +44,30 @@ public abstract class BasicOpmode extends LinearOpMode {
         hardware.init();
         Thread robotThread = new Thread(hardware);
         eventSystem.triggerInit();
-        while(opModeIsActive()){
+        prevTime = System.nanoTime();
+        //robotThread.start();
+        while(!isStopRequested()){
             if(isStarted() && !triggeredRun){
                 eventSystem.triggerStart();
                 triggeredRun = true;
             }
+            hardwareData = new HardwareData();
+            hardware.run();
             sensorData = hardware.getSensorData();
-            robotThread.start();
+            if(MathUtils.nanoToDSec(System.nanoTime() - prevTime) != 0) {
+                fps = 1 / MathUtils.nanoToDSec(System.nanoTime() - prevTime);
+            }else{
+                fps = 0;
+            }
+            prevTime = System.nanoTime();
             stateMachine.update(sensorData, hardwareData);
             eventSystem.update(sensorData, hardwareData);
             hardwareData.setDriveMotors(stateMachine.getDriveVelocities());
-            hardware.setHardware(hardwareData);
+            hardwareData.setTimestamp(System.currentTimeMillis());
+            hardware.addHardwarePacket(hardwareData);
             telemetry.update();
         }
+        hardware.stop();
     }
 
     public abstract void setup();

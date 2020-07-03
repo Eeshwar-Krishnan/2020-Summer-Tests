@@ -1,8 +1,13 @@
 package OpModes.Examples;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import Hardware.*;
 import Hardware.Packets.HardwareData;
 import Hardware.Packets.SensorData;
+import MathUtils.Vector3;
+import Odometry.ConstantVOdometer;
+import Odometry.Odometer;
 import OpModes.*;
 import State.GamepadDriveState;
 import State.LogicState;
@@ -14,8 +19,10 @@ import State.LogicState;
  * GamepadDriveState
  * Event System onStart trigger
  */
-
+@TeleOp
 public class ExampleTeleop extends BasicOpmode {
+    Vector3 position, velocity;
+    Odometer odometer;
     public ExampleTeleop() {
         super(new SkystoneHardware());
     }
@@ -24,6 +31,9 @@ public class ExampleTeleop extends BasicOpmode {
     public void setup() {
         hardware.registerAll();
         hardware.enableAll();
+        position = Vector3.ZERO();
+        velocity = Vector3.ZERO();
+        odometer = new ConstantVOdometer(stateMachine, position, velocity);
         eventSystem.onStart("Drive", new GamepadDriveState(stateMachine, gamepad1));
         eventSystem.onStart("Intake", new LogicState(stateMachine) {
             @Override
@@ -35,6 +45,15 @@ public class ExampleTeleop extends BasicOpmode {
                 }else{
                     hardwareData.setIntakePowers(0);
                 }
+            }
+        });
+        eventSystem.onStart("Odometer", odometer);
+        eventSystem.onStart("Telemetry", new LogicState(stateMachine) {
+            @Override
+            public void update(SensorData sensorData, HardwareData hardwareData) {
+                telemetry.addData("Position", position);
+                telemetry.addData("FPS", fps);
+                telemetry.addData("Intake", hardwareData.getIntakeLeft());
             }
         });
     }

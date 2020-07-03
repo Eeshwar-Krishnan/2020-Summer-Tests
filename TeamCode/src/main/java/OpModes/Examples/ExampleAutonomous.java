@@ -1,5 +1,7 @@
 package OpModes.Examples;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import java.util.*;
 
 import Hardware.*;
@@ -13,7 +15,7 @@ import Odometry.*;
 import OpModes.*;
 import State.*;
 import State.EventSystem.LinearTriggerBuilder;
-
+@Autonomous
 public class ExampleAutonomous extends BasicOpmode {
     Vector3 position, velocity;
     Odometer odometer;

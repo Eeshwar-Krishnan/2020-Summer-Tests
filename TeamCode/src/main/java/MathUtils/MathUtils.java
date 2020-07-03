@@ -40,7 +40,7 @@ public class MathUtils {
     }
 
     public static long secToNano(long time){
-        return time * 1_000_000_000;
+        return time * ((long)1_000_000_000);
     }
 
     public static long millisToNano(long time){
@@ -52,6 +52,10 @@ public class MathUtils {
     }
 
     public static long nanoToSec(long time){
-        return time/1_000_000_000;
+        return time/((long)1_000_000_000);
+    }
+
+    public static double nanoToDSec(long time){
+        return time/1_000_000_000.0;
     }
 }

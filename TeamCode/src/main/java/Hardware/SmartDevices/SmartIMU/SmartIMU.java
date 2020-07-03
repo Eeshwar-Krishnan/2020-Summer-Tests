@@ -13,7 +13,7 @@ import Hardware.SmartDevices.*;
 
 public class SmartIMU extends SmartDevice {
     SmartIMUConfiguration configuration;
-    BNO055IMU imu;
+    final BNO055IMU imu;
     Orientation offset, position;
     public SmartIMU(BNO055IMU imu, SmartIMUConfiguration configuration){
         this.imu = imu;
@@ -66,7 +66,6 @@ public class SmartIMU extends SmartDevice {
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
         imu.initialize(parameters);
         offset = imu.getAngularOrientation();
     }

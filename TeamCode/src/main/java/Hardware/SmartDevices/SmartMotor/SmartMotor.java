@@ -16,7 +16,7 @@ import Hardware.SmartDevices.SmartDevice;
 public class SmartMotor extends SmartDevice {
     private DcMotorEx motor;
     private SmartMotorConfiguration configuration;
-    private double position, velocity, power, prevPower, positionOffset;
+    private volatile double position, velocity, power, prevPower, positionOffset;
     private int port;
     public SmartMotor(DcMotor motor, SmartMotorConfiguration configuration) {
         this.motor = (DcMotorEx)motor;

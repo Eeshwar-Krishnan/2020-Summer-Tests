@@ -2,8 +2,10 @@ package Hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import Hardware.Packets.*;
 import Hardware.SmartDevices.*;
@@ -16,17 +18,22 @@ import Hardware.SmartDevices.*;
 
 public abstract class Hardware implements Runnable {
     public HashMap<String, SmartDevice> smartDevices = new HashMap<>();
-    public ArrayList<Hardware.Hardware.HardwareDevices> registeredDevices, enabledDevices;
+    public ArrayList<HardwareDevices> registeredDevices, enabledDevices;
     public LinearOpMode opMode;
     private final ArrayList<HardwareData> hardwarePackets;
     private ArrayList<SensorData> sensorPackets;
+    private AtomicBoolean end, available;
 
     public Hardware(){
         hardwarePackets = new ArrayList<>();
+        hardwarePackets.add(new HardwareData());
         sensorPackets = new ArrayList<>();
+        sensorPackets.add(new SensorData());
         sensorPackets.add(new SensorData());
         registeredDevices = new ArrayList<>();
         enabledDevices = new ArrayList<>();
+        end = new AtomicBoolean(false);
+        available = new AtomicBoolean(false);
     }
 
     public void attachOpmode(LinearOpMode opMode){
@@ -64,11 +71,13 @@ public abstract class Hardware implements Runnable {
      */
 
     public SensorData getSensorData(){
+        //while(!available.get());
         synchronized (sensorPackets) {
             SensorData out = sensorPackets.get(0);
             if (sensorPackets.size() > 1) {
                 sensorPackets.remove(0);
             }
+            available.set(false);
             return out;
         }
     }
@@ -89,22 +98,23 @@ public abstract class Hardware implements Runnable {
 
     @Override
     public void run(){
-        HardwareData hardwarePacket;
-        synchronized (hardwarePackets) {
-            hardwarePacket = hardwarePackets.get(0);
-            if (hardwarePackets.size() > 1) {
-                hardwarePackets.remove(0);
+            HardwareData hardwarePacket;
+            synchronized (hardwarePackets) {
+                hardwarePacket = hardwarePackets.get(0);
+                if (hardwarePackets.size() > 1) {
+                    hardwarePackets.remove(0);
+                }
             }
-        }
-        setHardware(hardwarePacket);
-        for(String device : smartDevices.keySet()){
-            smartDevices.get(device).update();
-        }
-        SensorData sensorData = new SensorData();
-        setSensors(sensorData);
-        synchronized (sensorPackets) {
-            sensorPackets.add(sensorData);
-        }
+            setHardware(hardwarePacket);
+            for (String device : smartDevices.keySet()) {
+                smartDevices.get(device).update();
+            }
+            SensorData sensorData = new SensorData();
+            setSensors(sensorData);
+            synchronized (sensorPackets) {
+                sensorPackets.add(sensorData);
+            }
+            available.set(true);
     }
 
     public void enableDevice(HardwareDevices device){
@@ -139,6 +149,10 @@ public abstract class Hardware implements Runnable {
 
     public void deRegisterDevice(HardwareDevices device){
         registeredDevices.remove(device);
+    }
+
+    public void stop(){
+        end.set(true);
     }
 
     public static enum HardwareDevices {

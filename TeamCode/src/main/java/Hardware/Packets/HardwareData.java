@@ -9,6 +9,7 @@ import MathUtils.Vector4;
 
 public class HardwareData {
     private double bl, br, fl, fr, intakeLeft, intakeRight;
+    private long timestamp;
     public HardwareData(){
         bl = 0;
         br = 0;
@@ -60,5 +61,13 @@ public class HardwareData {
     public void setIntakePowers(double powers){
         this.intakeRight = powers;
         this.intakeLeft = powers;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

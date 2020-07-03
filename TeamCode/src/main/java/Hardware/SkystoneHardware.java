@@ -23,12 +23,12 @@ public class SkystoneHardware extends Hardware {
             smartDevices.put("IMU", new SmartIMU(map.get(BNO055IMU.class, "imu"), new SmartIMUConfiguration().setAngleUnit(SmartIMU.AngleUnit.DEGREES)));
         }
         if(registeredDevices.contains(HardwareDevices.INTAKE)){
-            smartDevices.put("Intake Left", new SmartMotor(map.dcMotor.get("intakeLeft"), new SmartMotorConfiguration().reverseDirection()));
-            smartDevices.put("Intake Right", new SmartMotor(map.dcMotor.get("intakeRight"), new SmartMotorConfiguration()));
+            smartDevices.put("Intake Left", new SmartMotor(map.dcMotor.get("leftIntake"), new SmartMotorConfiguration().reverseDirection()));
+            smartDevices.put("Intake Right", new SmartMotor(map.dcMotor.get("rightIntake"), new SmartMotorConfiguration()));
         }
         if(registeredDevices.contains(HardwareDevices.ODOMETRY)){
-            smartDevices.put("Odometry Left", new SmartEncoder(map.dcMotor.get("intakeLeft"), new SmartEncoderConfiguration().reverseDirection()));
-            smartDevices.put("Odometry Right", new SmartEncoder(map.dcMotor.get("intakeRight"), new SmartEncoderConfiguration()));
+            smartDevices.put("Odometry Left", new SmartEncoder(map.dcMotor.get("leftIntake"), new SmartEncoderConfiguration().reverseDirection()));
+            smartDevices.put("Odometry Right", new SmartEncoder(map.dcMotor.get("rightIntake"), new SmartEncoderConfiguration()));
             smartDevices.put("Odometry Aux", new SmartEncoder(map.dcMotor.get("ll"), new SmartEncoderConfiguration()));
         }
     }
