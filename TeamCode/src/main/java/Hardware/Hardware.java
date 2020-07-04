@@ -2,6 +2,7 @@ package Hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,7 +72,7 @@ public abstract class Hardware implements Runnable {
      */
 
     public SensorData getSensorData(){
-        //while(!available.get());
+        while(!available.get());
         synchronized (sensorPackets) {
             SensorData out = sensorPackets.get(0);
             if (sensorPackets.size() > 1) {
@@ -98,6 +99,8 @@ public abstract class Hardware implements Runnable {
 
     @Override
     public void run(){
+        //while(!end.get()) {
+        RobotLog.ii("Packet Size", sensorPackets.size() + "");
             HardwareData hardwarePacket;
             synchronized (hardwarePackets) {
                 hardwarePacket = hardwarePackets.get(0);
@@ -115,6 +118,7 @@ public abstract class Hardware implements Runnable {
                 sensorPackets.add(sensorData);
             }
             available.set(true);
+        //}
     }
 
     public void enableDevice(HardwareDevices device){

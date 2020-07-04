@@ -13,8 +13,12 @@ public class MathUtils {
 
     public static double getRadRotDist(double start, double end){
         double dist = end - start;
-        if(dist > Math.PI){
-            return (end - (2 * Math.PI));
+        if(Math.abs(dist) > Math.PI){
+            if(start > Math.PI){
+                return ((end + (2 * Math.PI)) - start);
+            }else {
+                return ((end - (2 * Math.PI)) - start);
+            }
         }
         return dist;
     }

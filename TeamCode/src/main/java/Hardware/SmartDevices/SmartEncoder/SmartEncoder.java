@@ -1,6 +1,7 @@
 package Hardware.SmartDevices.SmartEncoder;
 
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import Hardware.SmartDevices.*;
 
@@ -12,7 +13,8 @@ import Hardware.SmartDevices.*;
  */
 
 public class SmartEncoder extends SmartDevice {
-    private double offset, position;
+    private volatile double position;
+    private volatile int offset;
     private SmartEncoderConfiguration configuration;
     private DcMotor motor;
 
@@ -23,7 +25,8 @@ public class SmartEncoder extends SmartDevice {
 
     @Override
     public void calibrate() {
-        offset = (configuration.direction ? -1 : 1) * motor.getCurrentPosition();
+        offset = motor.getCurrentPosition() * (configuration.direction ? -1 : 1);
+        RobotLog.ii("Calibrated " + getName(), offset + "" + " " + (configuration.direction ? -1 : 1));
     }
 
     public double getCurrentPosition(){
@@ -32,6 +35,6 @@ public class SmartEncoder extends SmartDevice {
 
     @Override
     public void update() {
-        position = ((configuration.direction ? -1 : 1) * motor.getCurrentPosition()) - offset;
+        position = (motor.getCurrentPosition() * (configuration.direction ? -1 : 1)) - offset;
     }
 }

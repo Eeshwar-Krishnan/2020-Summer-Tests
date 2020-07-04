@@ -55,12 +55,12 @@ public class ConstantVMathUtil {
 
     public static Vector2 toRobotCentric(double forward, double strafe, double rot){
         if(Math.abs(rot) == 0){
-            return new Vector2(forward, strafe);
+            return new Vector2(strafe, forward);
         }
         Vector2 vector = new Vector2(xIntegral(forward, strafe, rot), yIntegral(forward, strafe, rot));
         Vector2 polar = toPolar(vector.getA(), vector.getB());
         if(Double.isNaN(vector.getA()) || Double.isNaN(vector.getB())){
-            return new Vector2(forward, strafe);
+            return new Vector2(strafe, forward);
         }
         return vector;
     }

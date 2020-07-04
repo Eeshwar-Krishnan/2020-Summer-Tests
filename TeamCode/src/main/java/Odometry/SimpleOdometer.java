@@ -1,5 +1,7 @@
 package Odometry;
 
+import com.qualcomm.robotcore.util.RobotLog;
+
 import Hardware.Packets.*;
 import MathUtils.*;
 import State.*;
@@ -11,7 +13,7 @@ import State.*;
 
 public class SimpleOdometer extends Odometer {
     private Vector3 prevEncoderValues, prevPosition;
-    private double AUX_ROTATION_CONSTANT = 3600;
+    private double AUX_ROTATION_CONSTANT = 0;
     private double TRANSLATION_FACTOR = (0.0011);
     private double ROT_CONSTANT = 1.4032E-4;
     private double x, y, rot;
@@ -47,7 +49,8 @@ public class SimpleOdometer extends Odometer {
         rot = sensors.getGyro();
         double tau = (2 * Math.PI);
         rot = ((rot % tau) + tau) % tau;
-        position.set(x * TRANSLATION_FACTOR, y * TRANSLATION_FACTOR, rot);
+        //RobotLog.ii("Odometer", forInc + " " + strafeInc + " " + rotInc + " " + (r * Math.cos(theta)) + " " + (r * Math.sin(theta)));
+        position.set(x, y, rot);
         velocity.set(position.subtract(prevPosition).scale(1.0/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
         prevPosition.set(position);
         prevTime = System.nanoTime();

@@ -3,6 +3,7 @@ package Hardware.SmartDevices.SmartMotor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import Hardware.SmartDevices.SmartDevice;
 
@@ -73,7 +74,7 @@ public class SmartMotor extends SmartDevice {
 
     @Override
     public void update() {
-        if(Math.abs(power - prevPower) < 0.005) {
+        if(Math.abs(power - prevPower) > 0.005) {
             motor.setPower(power);
             prevPower = power;
         }

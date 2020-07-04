@@ -8,6 +8,7 @@ import Hardware.Packets.SensorData;
 import MathUtils.Vector3;
 import Odometry.ConstantVOdometer;
 import Odometry.Odometer;
+import Odometry.SimpleOdometer;
 import OpModes.*;
 import State.GamepadDriveState;
 import State.LogicState;
@@ -33,7 +34,7 @@ public class ExampleTeleop extends BasicOpmode {
         hardware.enableAll();
         position = Vector3.ZERO();
         velocity = Vector3.ZERO();
-        odometer = new ConstantVOdometer(stateMachine, position, velocity);
+        odometer = new SimpleOdometer(stateMachine, position, velocity);
         eventSystem.onStart("Drive", new GamepadDriveState(stateMachine, gamepad1));
         eventSystem.onStart("Intake", new LogicState(stateMachine) {
             @Override
@@ -53,7 +54,7 @@ public class ExampleTeleop extends BasicOpmode {
             public void update(SensorData sensorData, HardwareData hardwareData) {
                 telemetry.addData("Position", position);
                 telemetry.addData("FPS", fps);
-                telemetry.addData("Intake", hardwareData.getIntakeLeft());
+                telemetry.addData("Pods", new Vector3(sensorData.getOdometryLeft(), sensorData.getOdometryRight(), sensorData.getOdometryAux()));
             }
         });
     }

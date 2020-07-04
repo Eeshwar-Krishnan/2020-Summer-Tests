@@ -2,6 +2,7 @@ package Hardware;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import Hardware.Packets.*;
 import Hardware.SmartDevices.SmartEncoder.SmartEncoder;

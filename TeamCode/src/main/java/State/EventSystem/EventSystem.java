@@ -61,11 +61,13 @@ public class EventSystem {
         for(String state : initStates){
             stateMachine.activateLogic(state);
         }
+        stateMachine.setActiveDriveState(initDriveState);
     }
 
     public void triggerStart(){
         for(String state : startStates){
             stateMachine.activateLogic(state);
         }
+        stateMachine.setActiveDriveState(startDriveState);
     }
 }
