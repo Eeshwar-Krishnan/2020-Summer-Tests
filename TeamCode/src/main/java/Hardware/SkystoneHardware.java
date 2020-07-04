@@ -36,26 +36,26 @@ public class SkystoneHardware extends Hardware {
     @Override
     public void setHardware(HardwareData hardware) {
         if(enabledDevices.contains(HardwareDevices.DRIVE_MOTORS)){
-            ((SmartMotor) smartDevices.get("Front Left")).setPower(hardware.getFl());
-            ((SmartMotor) smartDevices.get("Front Right")).setPower(hardware.getFr());
-            ((SmartMotor) smartDevices.get("Back Left")).setPower(hardware.getBl());
-            ((SmartMotor) smartDevices.get("Back Right")).setPower(hardware.getBr());
+            smartDevices.get("Front Left", SmartMotor.class).setPower(hardware.getFl());
+            smartDevices.get("Front Right", SmartMotor.class).setPower(hardware.getFr());
+            smartDevices.get("Back Left", SmartMotor.class).setPower(hardware.getBl());
+            smartDevices.get("Back Right", SmartMotor.class).setPower(hardware.getBr());
         }
         if(enabledDevices.contains(HardwareDevices.INTAKE)){
-            ((SmartMotor) smartDevices.get("Intake Left")).setPower(hardware.getIntakeLeft());
-            ((SmartMotor) smartDevices.get("Intake Right")).setPower(hardware.getIntakeRight());
+            smartDevices.get("Intake Left", SmartMotor.class).setPower(hardware.getIntakeLeft());
+            smartDevices.get("Intake Right", SmartMotor.class).setPower(hardware.getIntakeRight());
         }
     }
 
     @Override
     public void setSensors(SensorData sensorData) {
         if(enabledDevices.contains(HardwareDevices.GYRO)){
-            sensorData.setGyro(((SmartIMU) smartDevices.get("IMU")).getHeading());
+            sensorData.setGyro(smartDevices.get("IMU", SmartIMU.class).getHeading());
         }
         if(enabledDevices.contains(HardwareDevices.ODOMETRY)){
-            sensorData.setOdometryLeft(((SmartEncoder) smartDevices.get("Odometry Left")).getCurrentPosition());
-            sensorData.setOdometryRight(((SmartEncoder) smartDevices.get("Odometry Right")).getCurrentPosition());
-            sensorData.setOdometryAux(((SmartEncoder) smartDevices.get("Odometry Aux")).getCurrentPosition());
+            sensorData.setOdometryLeft(smartDevices.get("Odometry Left", SmartEncoder.class).getCurrentPosition());
+            sensorData.setOdometryRight(smartDevices.get("Odometry Right", SmartEncoder.class).getCurrentPosition());
+            sensorData.setOdometryAux(smartDevices.get("Odometry Aux", SmartEncoder.class).getCurrentPosition());
         }
     }
 }

@@ -2,7 +2,6 @@ package Hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +16,7 @@ import Hardware.SmartDevices.*;
  */
 
 public abstract class Hardware implements Runnable {
-    public HashMap<String, SmartDevice> smartDevices = new HashMap<>();
+    public SmartDeviceMap smartDevices;
     public ArrayList<HardwareDevices> registeredDevices, enabledDevices;
     public LinearOpMode opMode;
     private final ArrayList<HardwareData> hardwarePackets;
@@ -25,6 +24,7 @@ public abstract class Hardware implements Runnable {
     private AtomicBoolean end, available;
 
     public Hardware(){
+        smartDevices = new SmartDeviceMap();
         hardwarePackets = new ArrayList<>();
         hardwarePackets.add(new HardwareData());
         sensorPackets = new ArrayList<>();
@@ -82,7 +82,7 @@ public abstract class Hardware implements Runnable {
         }
     }
 
-    public HashMap<String, SmartDevice> getSmartDevices(){
+    public SmartDeviceMap getSmartDevices(){
         return smartDevices;
     }
 

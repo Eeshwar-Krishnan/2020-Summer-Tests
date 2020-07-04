@@ -1,4 +1,6 @@
-//
+dependencies {
+    //compile files('..\\libs\\reflections-0.9.10.jar')
+}//
 // build.gradle in TeamCode
 //
 // Most of the definitions for building your module reside in a common, shared
