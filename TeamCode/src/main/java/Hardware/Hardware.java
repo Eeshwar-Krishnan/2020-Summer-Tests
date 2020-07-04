@@ -99,8 +99,7 @@ public abstract class Hardware implements Runnable {
 
     @Override
     public void run(){
-        //while(!end.get()) {
-        RobotLog.ii("Packet Size", sensorPackets.size() + "");
+        while(!end.get()) {
             HardwareData hardwarePacket;
             synchronized (hardwarePackets) {
                 hardwarePacket = hardwarePackets.get(0);
@@ -118,7 +117,7 @@ public abstract class Hardware implements Runnable {
                 sensorPackets.add(sensorData);
             }
             available.set(true);
-        //}
+        }
     }
 
     public void enableDevice(HardwareDevices device){

@@ -6,7 +6,8 @@ package Hardware.Packets;
  */
 
 public class SensorData {
-    private double odometryLeft, odometryRight, odometryAux, gyro;
+    private double gyro;
+    private int odometryLeft, odometryRight, odometryAux;
     public SensorData(){
         odometryAux = 0;
         odometryLeft = 0;
@@ -14,27 +15,27 @@ public class SensorData {
         gyro = 0;
     }
 
-    public double getOdometryAux() {
+    public int getOdometryAux() {
         return odometryAux;
     }
 
-    public void setOdometryAux(double odometryAux) {
+    public void setOdometryAux(int odometryAux) {
         this.odometryAux = odometryAux;
     }
 
-    public double getOdometryLeft() {
+    public int getOdometryLeft() {
         return odometryLeft;
     }
 
-    public void setOdometryLeft(double odometryLeft) {
+    public void setOdometryLeft(int odometryLeft) {
         this.odometryLeft = odometryLeft;
     }
 
-    public void setOdometryRight(double odometryRight) {
+    public void setOdometryRight(int odometryRight) {
         this.odometryRight = odometryRight;
     }
 
-    public double getOdometryRight() {
+    public int getOdometryRight() {
         return odometryRight;
     }
 

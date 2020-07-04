@@ -13,7 +13,7 @@ import Hardware.SmartDevices.*;
  */
 
 public class SmartEncoder extends SmartDevice {
-    private volatile double position;
+    private volatile int position;
     private volatile int offset;
     private SmartEncoderConfiguration configuration;
     private DcMotor motor;
@@ -26,10 +26,9 @@ public class SmartEncoder extends SmartDevice {
     @Override
     public void calibrate() {
         offset = motor.getCurrentPosition() * (configuration.direction ? -1 : 1);
-        RobotLog.ii("Calibrated " + getName(), offset + "" + " " + (configuration.direction ? -1 : 1));
     }
 
-    public double getCurrentPosition(){
+    public int getCurrentPosition(){
         return position;
     }
 

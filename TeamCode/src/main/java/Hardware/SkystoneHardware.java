@@ -21,7 +21,7 @@ public class SkystoneHardware extends Hardware {
             smartDevices.put("Back Right", new SmartMotor(map.dcMotor.get("tr"), new SmartMotorConfiguration()));
         }
         if(registeredDevices.contains(HardwareDevices.GYRO)){
-            smartDevices.put("IMU", new SmartIMU(map.get(BNO055IMU.class, "imu"), new SmartIMUConfiguration().setAngleUnit(SmartIMU.AngleUnit.DEGREES)));
+            smartDevices.put("IMU", new SmartIMU(map.get(BNO055IMU.class, "imu"), new SmartIMUConfiguration().setAngleUnit(SmartIMU.AngleUnit.RADIANS)));
         }
         if(registeredDevices.contains(HardwareDevices.INTAKE)){
             smartDevices.put("Intake Left", new SmartMotor(map.dcMotor.get("leftIntake"), new SmartMotorConfiguration().reverseDirection()));

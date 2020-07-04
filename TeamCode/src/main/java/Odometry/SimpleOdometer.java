@@ -35,7 +35,7 @@ public class SimpleOdometer extends Odometer {
 
     @Override
     public void update(SensorData sensors, HardwareData hardwareData) {
-        double forInc = ((sensors.getOdometryLeft() + sensors.getOdometryRight())/2) - prevEncoderValues.getA();
+        double forInc = ((sensors.getOdometryLeft() + sensors.getOdometryRight())/2.0) - prevEncoderValues.getA();
         //double rotInc = (((sensors.getOdometryRight() - sensors.getOdometryLeft())/2) * ROT_CONSTANT) - prevEncoderValues.getC();
         double rotInc = MathUtils.getRadRotDist(prevEncoderValues.getC(), sensors.getGyro());
         double strafeInc = (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)) - prevEncoderValues.getB();
@@ -54,6 +54,6 @@ public class SimpleOdometer extends Odometer {
         velocity.set(position.subtract(prevPosition).scale(1.0/MathUtils.nanoToSec(System.nanoTime() - prevTime)));
         prevPosition.set(position);
         prevTime = System.nanoTime();
-        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), sensors.getGyro());
+        prevEncoderValues.set(((sensors.getOdometryLeft() + sensors.getOdometryRight())/2.0), (sensors.getOdometryAux() - (AUX_ROTATION_CONSTANT * rotInc)), sensors.getGyro());
     }
 }

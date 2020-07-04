@@ -45,14 +45,14 @@ public abstract class BasicOpmode extends LinearOpMode {
         Thread robotThread = new Thread(hardware);
         eventSystem.triggerInit();
         prevTime = System.nanoTime();
-        //robotThread.start();
+        robotThread.start();
         while(!isStopRequested()){
             if(isStarted() && !triggeredRun){
                 eventSystem.triggerStart();
                 triggeredRun = true;
             }
             hardwareData = new HardwareData();
-            hardware.run();
+            //hardware.run();
             sensorData = hardware.getSensorData();
             if(MathUtils.nanoToDSec(System.nanoTime() - prevTime) != 0) {
                 fps = 1 / MathUtils.nanoToDSec(System.nanoTime() - prevTime);
