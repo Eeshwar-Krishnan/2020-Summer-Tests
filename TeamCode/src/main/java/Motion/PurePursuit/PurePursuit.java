@@ -33,7 +33,7 @@ public class PurePursuit extends DriveToPoint {
         Vector2 intersect1 = Vector2.ZERO(), intersect2 = Vector2.ZERO();
         Vector2 pos = position.getVector2();
         Vector2 targetPos = Vector2.ZERO();
-        RobotLog.ii("Position", position.toString());
+        //RobotLog.ii("Position", position.toString());
         Vector2[] locTargets = getBestLine();
         double intersections = findLineCircleIntersections(position.getA(), position.getB(), locRadius, locTargets[0], locTargets[1], intersect1, intersect2);
         while(intersections < 2){
@@ -45,7 +45,7 @@ public class PurePursuit extends DriveToPoint {
         }else{
             targetPos.set(intersect2);
         }
-        RobotLog.i(targetPos.toString());
+        //RobotLog.i(targetPos.toString());
         localTarget.set(targetPos, rotTarget);
     }
 

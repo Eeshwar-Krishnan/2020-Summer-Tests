@@ -3,6 +3,7 @@ package OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import Debug.Dashboard.Dashboard;
 import Hardware.*;
 import Hardware.Packets.*;
 import State.EventSystem.*;
@@ -66,6 +67,7 @@ public abstract class BasicOpmode extends LinearOpMode {
             hardwareData.setTimestamp(System.currentTimeMillis());
             hardware.addHardwarePacket(hardwareData);
             telemetry.update();
+            Dashboard.sendTelemetry();
         }
         hardware.stop();
     }

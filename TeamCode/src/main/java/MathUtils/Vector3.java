@@ -86,6 +86,10 @@ public class Vector3 {
         return ZERO.clone();
     }
 
+    public boolean equals(Vector3 vector3){
+        return (vector3.a == a) && (vector3.b == b) && (vector3.c == c);
+    }
+
     @Override
     public String toString() {
         return a + ", " + b + ", " + c;
