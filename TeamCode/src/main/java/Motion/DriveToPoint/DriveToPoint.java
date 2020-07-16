@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import Hardware.Packets.HardwareData;
 import Hardware.Packets.SensorData;
+import State.FieldCentricDriveState;
 import State.StateMachine;
 import State.VelocityDriveState;
 import MathUtils.*;
@@ -37,22 +38,17 @@ public abstract class DriveToPoint extends VelocityDriveState {
         setTarget();
         double errY = localTarget.getB() - position.getA();
         double errX = localTarget.getB() - position.getB();
-        double errRot = localTarget.getC() - Math.toDegrees(position.getC());
         double r = Math.sqrt((errX * errX) + (errY * errY));
         double theta = Math.atan2(errY, errX) + position.getC();
-        if(errRot > 180){
-            errRot = (localTarget.getC() - (360 + Math.toDegrees(sensors.getGyro())));
-        }else if(errRot < -180){
-            errRot = ((360 + localTarget.getC()) - Math.toDegrees(sensors.getGyro()));
-        }
-        errRot = Range.clip(errRot/ 30, -1, 1);
+        double errRot = MathUtils.getRadRotDist(Math.toDegrees(position.getC()), localTarget.getC());
+        errRot = Range.clip(errRot/15, -1, 1);
         if(Math.abs(errRot) < 0.2 && errRot != 0){
             errRot = (Math.abs(errRot)/errRot) * 0.2;
         }
         double comb = ((r * Math.cos(theta))) + ((r * Math.sin(theta)));
         double x = (r * Math.cos(theta))/comb;
         double y = (r * Math.sin(theta))/comb;
-        velocity.set(x * power, -y * power, errRot * power); //Try -x?
+        velocity.set(x * power, -y * power, errRot * power);
     }
 
     public abstract void setTarget();

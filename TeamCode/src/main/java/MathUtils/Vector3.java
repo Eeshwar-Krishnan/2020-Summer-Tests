@@ -90,6 +90,10 @@ public class Vector3 {
         return (vector3.a == a) && (vector3.b == b) && (vector3.c == c);
     }
 
+    public Vector4 getVector4(double d){
+        return new Vector4(a, b, c, d);
+    }
+
     @Override
     public String toString() {
         return a + ", " + b + ", " + c;

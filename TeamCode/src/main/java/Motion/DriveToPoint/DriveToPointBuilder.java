@@ -8,12 +8,15 @@ import State.StateMachine;
 
 public class DriveToPointBuilder {
     private StateMachine stateMachine;
-    private double speed;
-    private Vector3 position, target;
+    private double speed, rot;
+    private Vector3 position;
+    private Vector2 target;
     public DriveToPointBuilder(StateMachine stateMachine, Vector3 position){
         this.position = position;
         this.stateMachine = stateMachine;
-        target = Vector3.ZERO();
+        target = Vector2.ZERO();
+        speed = 1;
+        rot = 0;
     }
 
     public DriveToPointBuilder setSpeed(double speed){
@@ -21,16 +24,21 @@ public class DriveToPointBuilder {
         return this;
     }
 
-    public DriveToPointBuilder setTarget(Vector3 target){
+    public DriveToPointBuilder setRot(double rot){
+        this.rot = rot;
+        return this;
+    }
+
+    public DriveToPointBuilder setTarget(Vector2 target){
         target.set(target);
         return this;
     }
 
     public DriveToPoint complete(){
-        return new DriveToPoint(stateMachine, position, target, speed) {
+        return new DriveToPoint(stateMachine, position, target.toVector3(rot), speed) {
             @Override
             public void setTarget() {
-                localTarget.set(target);
+                localTarget.set(target.toVector3(rot));
             }
         };
     }
