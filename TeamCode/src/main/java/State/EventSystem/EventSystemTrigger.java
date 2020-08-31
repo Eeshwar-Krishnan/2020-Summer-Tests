@@ -21,9 +21,8 @@ public abstract class EventSystemTrigger {
         this.stateMachine = stateMachine;
     }
 
-    public void addState(String state, LogicState logicState){
+    public void addState(String state){
         states.add(state);
-        stateMachine.appendLogicState(state, logicState);
     }
 
     public void addDriveState(String state, DriveState driveState){

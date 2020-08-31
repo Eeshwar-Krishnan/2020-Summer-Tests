@@ -14,6 +14,7 @@ import Motion.Terminators.Terminator;
 import Odometry.*;
 import OpModes.*;
 import State.*;
+import State.EventSystem.LinearEventSystem;
 import State.EventSystem.LinearTriggerBuilder;
 @Autonomous
 public class ExampleAutonomous extends BasicOpmode {
@@ -56,114 +57,42 @@ public class ExampleAutonomous extends BasicOpmode {
                 .addTarget(new Vector2(-10, 70))
                 .setSpeed(0.4)
                 .complete());
+        driveStates.put("Stop", new DriveState(stateMachine) {
+            @Override
+            public Vector4 getDriveVelocities() {
+                return Vector4.ZERO();
+            }
+
+            @Override
+            public void update(SensorData sensorData, HardwareData hardwareData) {
+
+            }
+        });
         stateMachine.appendDriveStates(driveStates);
 
-        LinearTriggerBuilder builder = new LinearTriggerBuilder(stateMachine, opmodeVariables, "count");
+        HashMap<String, LogicState> autoStates = new HashMap<>();
+        autoStates.put("First", new DriveStateActivator(stateMachine, "First Movement"));
+        autoStates.put("Second", new DriveStateActivator(stateMachine, "Second Movement"));
+        autoStates.put("Third", new DriveStateActivator(stateMachine, "Third Movement"));
+        autoStates.put("Fourth", new DriveStateActivator(stateMachine, "Fourth Movement"));
+        autoStates.put("End", new DriveStateActivator(stateMachine, "Stop"));
+        stateMachine.appendLogicStates(autoStates);
 
-        eventSystem.onTrigger(builder.setOrder(1).disableOnEndTrigger().build(), "Move 1", new LogicState(stateMachine){
-            Terminator orientationTerminator;
-            @Override
-            public void init(SensorData sensorData, HardwareData hardwareData) {
-                stateMachine.setActiveDriveState("First Movement");
-                orientationTerminator = new OrientationTerminator(position, new Vector3(-20, 50, 0), 5);
-            }
+        final LinearEventSystem linearSystem = new LinearEventSystem(stateMachine, LinearEventSystem.ENDTYPE.CONTINUE_LAST);
 
-            @Override
-            public void update(SensorData sensorData, HardwareData hardwareData) {
-                if(orientationTerminator.shouldTerminate(sensorData, hardwareData)){
-                    opmodeVariables.integers.put("count", 2);
-                    stateMachine.deactivateState("First Movement");
-                }
-            }
-        });
+        linearSystem.put("First", new OrientationTerminator(position, new Vector3(-20, 50, 0), 5));
+        linearSystem.put("Second", new OrientationTerminator(position, new Vector3(-15, 20, 0), 5));
+        linearSystem.put("Third", new OrientationTerminator(position, new Vector3(-15, 80, 0), 5));
+        linearSystem.put("Fourth", new OrientationTerminator(position, new Vector3(-10, 70, 0), 5));
+        linearSystem.put("End", Terminator.nullTerminator());
 
-        eventSystem.onTrigger(builder.setOrder(2).disableOnEndTrigger().build(), "Move 2", new LogicState(stateMachine){
-            Terminator orientationTerminator;
-            @Override
-            public void init(SensorData sensorData, HardwareData hardwareData) {
-                stateMachine.setActiveDriveState("Second Movement");
-                orientationTerminator = new OrientationTerminator(position, new Vector3(-15, 20, 0), 5);
-            }
-
+        stateMachine.appendLogicState("Main", new LogicState(stateMachine) {
             @Override
             public void update(SensorData sensorData, HardwareData hardwareData) {
-                if(orientationTerminator.shouldTerminate(sensorData, hardwareData)){
-                    opmodeVariables.integers.put("count", 3);
-                    stateMachine.deactivateState("Second Movement");
-                }
+                linearSystem.update(sensorData, hardwareData);
             }
         });
 
-        eventSystem.onTrigger(builder.setOrder(3).disableOnEndTrigger().build(), "Move 3", new LogicState(stateMachine){
-            Terminator orientationTerminator;
-            @Override
-            public void init(SensorData sensorData, HardwareData hardwareData) {
-                stateMachine.setActiveDriveState("Third Movement");
-                orientationTerminator = new OrientationTerminator(position, new Vector3(-15, 80, 0), 5);
-            }
-
-            @Override
-            public void update(SensorData sensorData, HardwareData hardwareData) {
-                if(orientationTerminator.shouldTerminate(sensorData, hardwareData)){
-                    opmodeVariables.integers.put("count", 4);
-                    stateMachine.deactivateState("Third Movement");
-                }
-            }
-        });
-
-        eventSystem.onTrigger(builder.setOrder(4).disableOnEndTrigger().build(), "Move 4", new LogicState(stateMachine){
-            Terminator orientationTerminator;
-            @Override
-            public void init(SensorData sensorData, HardwareData hardwareData) {
-                stateMachine.setActiveDriveState("Fourth Movement");
-                orientationTerminator = new OrientationTerminator(position, new Vector3(-10, 70, 0), 5);
-            }
-
-            @Override
-            public void update(SensorData sensorData, HardwareData hardwareData) {
-                if(orientationTerminator.shouldTerminate(sensorData, hardwareData)){
-                    opmodeVariables.integers.put("count", 5);
-                    stateMachine.deactivateState("Fourth Movement");
-                }
-            }
-        });
-
-        eventSystem.onTrigger(builder.setOrder(5).disableOnEndTrigger().build(), "End", new LogicState(stateMachine) {
-            @Override
-            public void init(SensorData sensorData, HardwareData hardwareData) {
-                stateMachine.appendDriveState("Stop", new VelocityDriveState(stateMachine) {
-                    @Override
-                    public Vector3 getVelocities() {
-                        return Vector3.ZERO();
-                    }
-
-                    @Override
-                    public void update(SensorData sensorData, HardwareData hardwareData) {
-
-                    }
-                });
-                stateMachine.setActiveDriveState("Stop");
-            }
-
-            @Override
-            public void update(SensorData sensorData, HardwareData hardwareData) {
-                telemetry.addData("Finished", true);
-            }
-        });
-
-        eventSystem.onStart("startCount", new SingleLogicState(stateMachine) {
-            @Override
-            public void main(SensorData sensorData, HardwareData hardwareData) {
-                opmodeVariables.integers.put("count", 1);
-            }
-        });
-
-        eventSystem.onStart("telemetryData", new LogicState(stateMachine) {
-            @Override
-            public void update(SensorData sensorData, HardwareData hardwareData) {
-                telemetry.addData("Position", position);
-                telemetry.addData("Count", opmodeVariables.integers.get("count"));
-            }
-        });
+        stateMachine.activateLogic("Main");
     }
 }

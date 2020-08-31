@@ -3,21 +3,19 @@ package org.firstinspires.ftc.robotcontroller.internal.WebInterface;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.qualcomm.robotcore.eventloop.EventLoop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcontroller.internal.WebInterface.JsonPackets.*;
 import org.firstinspires.ftc.robotcontroller.internal.WebInterface.VSD.VirtualSD;
+import org.firstinspires.ftc.robotcore.internal.collections.SimpleGson;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.firstinspires.ftc.robotcore.internal.opmode.RegisteredOpModes;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,9 +23,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class InterfaceHandler implements Runnable{
+    static final int WEBSOCKET_PORT = 9000;
+
     private static InterfaceHandler instance = new InterfaceHandler();
     private EventLoop eventLoop;
     private OpModeManagerImpl opModeManager;
@@ -37,7 +38,7 @@ public class InterfaceHandler implements Runnable{
     private JavaHTTPServer javaHTTPServer;
     private ArrayList<String> packets;
     private HashMap<String, String> telemetry, editableValues;
-    private boolean running, sendTelemetry;
+    private volatile boolean running, sendTelemetry;
     public static InterfaceHandler getInstance(){
         return instance;
     }
@@ -92,7 +93,112 @@ public class InterfaceHandler implements Runnable{
         new Thread(new SyncOpmodes()).start();
     }
 
-    public void run()  {
+    @Override
+    public void run(){
+        WebsocketHandler handler = new WebsocketHandler(WEBSOCKET_PORT);
+        handler.start();
+        RobotLog.i("Dashboard Started");
+        Gson gson = SimpleGson.getInstance();
+        long timer = 0;
+        while(running){
+            timer = System.currentTimeMillis() + 50;
+            HashMap<String, String> newMessages = handler.getNewMessages();
+            for(String s : newMessages.keySet()){
+                if(Objects.equals(newMessages.get(s), "OPMODES")){
+                    OpmodePacket packet = new OpmodePacket();
+                    packet.opmodes = opmodes.toArray(new String[0]);
+                    handler.send(s, gson.toJson(packet));
+                }
+                if(Objects.equals(newMessages.get(s), "FILEINDEX")) {
+                    FileIndexPacket packet = new FileIndexPacket();
+                    ArrayList<String> fileIndex = VirtualSD.getInstance().indexFiles();
+                    packet.files = fileIndex.toArray(new String[0]);
+                    handler.send(s, gson.toJson(packet));
+                }
+                if(Objects.equals(newMessages.get(s), "FOLDERSINDEX")) {
+                    FolderIndexPacket packet = new FolderIndexPacket();
+                    ArrayList<String> folderIndex = VirtualSD.getInstance().indexFolders();
+                    packet.folders = folderIndex.toArray(new String[0]);
+                    handler.send(s, gson.toJson(packet));
+                }
+                if(newMessages.get(s).startsWith("GET")) {
+                    FilePacket packet = new FilePacket();
+                    try {
+                        packet.fileText = VirtualSD.getInstance().getFile(newMessages.get(s).replace("GET ", "")).read();
+                    } catch (IOException e) {
+                        packet.fileText = "";
+                    }
+                    handler.send(s, gson.toJson(packet));
+                }
+                if(newMessages.get(s).startsWith("EDIT")) {
+                    FileEditPacket packet = gson.fromJson(newMessages.get(s).replace("EDIT ", ""), FileEditPacket.class);
+                    try {
+                        VirtualSD.getInstance().getFile(packet.file).clear();
+                        VirtualSD.getInstance().getFile(packet.file).write(packet.text);
+                    } catch (IOException ignored) {
+                    }
+                }
+                if(newMessages.get(s).startsWith("CREATEFOLDER")){
+                    try {
+                        VirtualSD.getInstance().addFolder(newMessages.get(s).replace("CREATEFOLDER ", ""));
+                    } catch (IOException ignored) {
+                    }
+                }
+                if(newMessages.get(s).startsWith("DELETEFILE")){
+                    try {
+                        VirtualSD.getInstance().getFile(newMessages.get(s).replace("DELETEFILE ", "")).deleteFile();
+                    } catch (IOException ignored) {
+                    }
+                }
+                if(newMessages.get(s).startsWith("DELETEFOLDER")){
+                    VirtualSD.getInstance().deleteFolder(newMessages.get(s).replace("DELETEFOLDER ", ""));
+                }
+                if(newMessages.get(s).startsWith("INIT")){
+                    opModeManager.initActiveOpMode(newMessages.get(s).replace("INIT ", ""));
+                }
+                if(newMessages.get(s).equals("START")){
+                    opModeManager.startActiveOpMode();
+                }
+                if(newMessages.get(s).equals("STOP")){
+                    OpMode opName = opModeManager.getActiveOpMode();
+                    opModeManager.requestOpModeStop(opName);
+                }
+                if(newMessages.get(s).startsWith("GAMEPAD")){
+                    setGamepad(newMessages.get(s).replace("GAMEPAD ", ""));
+                }
+                if(newMessages.get(s).startsWith("MOUSECOORDS")){
+                    setMousePos(newMessages.get(s).replace("MOUSECOORDS ", ""));
+                }
+            }
+            if(sendTelemetry){
+                TelemetryPacket packet = new TelemetryPacket();
+                packet.timestamp = System.currentTimeMillis();
+                synchronized (telemetry) {
+                    for (String s : telemetry.keySet()) {
+                        telemetryPacket.add(s + " : " + telemetry.get(s));
+                    }
+                }
+                telemetryPacket.addAll(telemetryStrings);
+                String telemetryStr = "";
+                for(String s : telemetryPacket){
+                    telemetryStr += s + "<br>";
+                }
+                packet.telemetry = telemetryStr;
+                sendTelemetry = false;
+                packet.position = position;
+                telemetryPacket.clear();
+                synchronized (telemetry) {
+                    telemetry.clear();
+                }
+                if(!telemetryStr.equals("")) {
+                    handler.sendAll(gson.toJson(packet));
+                }
+            }
+            while(System.currentTimeMillis() < timer); //Limit to 50 ms per cycle so we don't accidentally DOS the client
+        }
+    }
+
+    public void run2()  {
         while(running) {
             if(sendTelemetry) {
                 for (String s : telemetry.keySet()) {
@@ -159,7 +265,9 @@ public class InterfaceHandler implements Runnable{
     }
 
     public void internalAddTelemetry(String header, Object data){
-        telemetry.put(header, data.toString());
+        synchronized (telemetry) {
+            telemetry.put(header, data.toString());
+        }
     }
 
     public void internalAddLine(String line){

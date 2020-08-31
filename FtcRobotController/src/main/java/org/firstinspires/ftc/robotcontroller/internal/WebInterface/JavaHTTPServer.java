@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
@@ -38,7 +40,7 @@ public class JavaHTTPServer implements Runnable{
 	static final int PORT = 4750;
 
 	// verbose mode
-	static final boolean verbose = false;
+	static final boolean verbose = true;
 
 	// Client Connection via Socket Class
 	private Socket connect;
@@ -237,6 +239,17 @@ public class JavaHTTPServer implements Runnable{
 	}
 
 	private byte[] readFileData(String str) throws IOException {
+		if(verbose){
+			RobotLog.ii("DashboardFileRecord", str);
+		}
+		if(str.equals("/gateway")){
+			String ip;
+			try(final DatagramSocket datagram = new DatagramSocket()){
+				datagram.connect(InetAddress.getByName("8.8.8.8"), 10002);
+				ip = datagram.getLocalAddress().getHostAddress();
+			}
+			return ("ws://" + ip + ":9000/").getBytes("UTF-8");
+		}
 		if(str.equals("/ping.txt")){
 			return String.valueOf(System.currentTimeMillis()).getBytes("UTF8");
 		}

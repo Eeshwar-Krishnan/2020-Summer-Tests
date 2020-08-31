@@ -9,4 +9,13 @@ import Hardware.Packets.*;
 
 public abstract class Terminator {
     public abstract boolean shouldTerminate(SensorData sensorData, HardwareData hardwareData);
+
+    public static Terminator nullTerminator(){
+        return new Terminator() {
+            @Override
+            public boolean shouldTerminate(SensorData sensorData, HardwareData hardwareData) {
+                return false;
+            }
+        };
+    }
 }
